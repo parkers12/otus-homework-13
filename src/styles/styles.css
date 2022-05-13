@@ -1,0 +1,268 @@
+/* Main styles */
+@import url("./reset.css");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.wrapper {
+  width: 1160px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: auto;
+  margin: 0 auto;
+}
+
+.header {
+  padding: 1.5rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.main {
+  padding-bottom: 2rem;
+}
+
+.title,
+.subTitle,
+.city {
+  font-weight: bold;
+  color: #009fff;
+}
+
+.title {
+  font-size: 2rem;
+  line-height: 2.5rem;
+}
+
+.subTitle,
+.city {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.subTitle {
+  margin-bottom: 0.8rem;
+}
+
+.icon {
+  width: 2rem;
+  height: 2rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.form {
+  display: flex;
+  padding: 0;
+  height: 2.5rem;
+  position: relative;
+}
+
+.input {
+  flex: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0.6rem 2.5rem 0.6rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  outline: 0;
+  border: 1px solid gainsboro;
+  border-radius: 0.25rem;
+  height: 100%;
+  transition: all 0.3s;
+  min-width: 350px;
+  font-weight: 400;
+  color: #777;
+}
+
+.input:hover,
+.input:focus {
+  border: 1px solid rgb(189, 189, 189);
+}
+
+.input.wrong {
+  border-color: #ff0000;
+}
+
+.button {
+  background-image: url(./../img/search.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 1.5rem;
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.5rem;
+  border: none;
+  outline: 0;
+  cursor: pointer;
+  width: 2.5rem;
+  height: 100%;
+  transition: all 0.3s;
+}
+
+.button:hover {
+  -webkit-filter: none;
+  filter: none;
+}
+
+.data {
+  width: 100%;
+  display: none;
+  padding: 1.5rem 0 0.5rem;
+}
+
+.dataEmpty {
+  display: none;
+  color: #777;
+}
+
+.dataEmpty.center {
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #f7f7f7;
+}
+
+.dataWeather {
+  min-height: 275px;
+}
+
+.section {
+  width: 30%;
+}
+
+.aside {
+  width: 70%;
+  height: 610px;
+  padding-left: 1.5rem;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.block {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #777;
+  line-height: 1rem;
+  border-bottom: 1px dotted rgba(119, 119, 119, 0.4);
+}
+
+.block:not(:last-child) {
+  margin-bottom: 0.6rem;
+}
+
+.btn {
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btn:hover {
+  color: #009fff;
+}
+
+.cityBlock {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #777;
+  margin-bottom: 0.8rem;
+}
+
+.label,
+.value {
+  position: relative;
+  background-color: #fff;
+  z-index: 1;
+  top: 3px;
+}
+
+.label {
+  padding-right: 5px;
+}
+
+.value {
+  padding-left: 5px;
+  font-weight: bold;
+  color: #009fff;
+  max-width: 80%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.list {
+  width: 100%;
+  padding: 2rem 0 0;
+}
+
+.plug {
+  display: none;
+}
+
+.memory {
+  margin-top: 0.8rem;
+}
+
+/* placeholder */
+.input::-webkit-input-placeholder {
+  color: #b5b5b5;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.input::-moz-placeholder {
+  color: #b5b5b5;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.input:-moz-placeholder {
+  color: #b5b5b5;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.input:-ms-input-placeholder {
+  color: #b5b5b5;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+.input:focus::-webkit-input-placeholder {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.input:focus::-moz-placeholder {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.input:focus:-moz-placeholder {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.input:focus:-ms-input-placeholder {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
