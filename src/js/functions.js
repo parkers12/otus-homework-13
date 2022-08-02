@@ -239,15 +239,18 @@ export async function getLocalStorage() {
     for (let j = 0; j < memory.length; j += 1) {
       memory[j].remove();
     }
-    const arr = localStor.split(",");
-    for (let i = 0; i < arr.length; i += 1) {
-      (async function getTemp() {
-        const temp = await getTemperature(arr[i]);
-        // getWeatherCities(arr[i], temp, i);
+    // const arr = localStor.split(",");
+    // for (let i = 0; i < arr.length; i += 1) {
+    //   (async function getTemp() {
+    //     const temp = await getTemperature(arr[i]);
+    //     // getWeatherCities(arr[i], temp, i);
 
-        CityList.render(arr[i], temp, i);
-      })();
-    }
+    //     // CityList.render(arr[i], temp, i);
+    //     // console.log(temp);
+    //   })();
+    // }
+    const cityList = new CityList();
+    cityList.render();
     dataViewer("memory", "block");
     dataViewer("plugList", "none");
     // getClicker();
