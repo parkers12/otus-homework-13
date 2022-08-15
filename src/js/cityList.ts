@@ -1,147 +1,270 @@
-import { getTemperature, getWeather } from "./functions";
+import { getTemperature, getWeather, dataViewer } from "./functions";
 
-// export class Component<State = string> {
-//   private tpl;
-
-//   state: State | undefined;
-//   events: {
-//       [key: string]: (ev: Event) => void;
-//   };
-
-//   constructor(tpl: HTMLElement);
-//   subscribeToEvents(): void;
-//   setState(city: string, state: string): void;
-//   onMount(tpl: HTMLElement): void;
-//   render(tpl: string, state: string): string;
-// };
-
-interface CityData {
-  name: string;
-  tmp: string;
-}
-export class CityList {
-  #key: string;
-  state: string;
-  tpl: string;
-
-  constructor() {
-    this.#key = "weatherForecast";
-    this.state = localStorage.getItem(this.#key) as string;
-
-    this.tpl = `
-      <h2>{{title}}</h2>
-      {{if city}}
-          <div id="memory" class="memory" style="display: block;">
-              {{for cities}}
-                  <div id="{{city}}" class="block">
-                      <div id="{{i}}" class="label btn">{{city}}</div>
-                      <div class="value">{{tmp}}</div>
-                  </div>
-              {{endfor}}
-          </div>
-      {{endif}}
-    `;
+export default class Component<State = {}> {
+  state: Partial<State>;
+  events: {
+    [key: string]: (ev: Event) => void;
+  };
+  constructor(private el: HTMLElement, initialState?: Partial<State>) {
+    this.state = initialState || {};
+    this.events = {};
+    this.el = el;
+    this.onMount(el);
   }
 
-  subscribeToEvents(event: Event): void {
-    setTimeout(() => {
-      const classElem = event.target.getAttribute("class");
-      if (classElem === "block") {
-        getWeather(event.target.getAttribute("id"));
-      } else {
-        getWeather(event.target.parentNode.getAttribute("id"));
-      }
-    }, 300);
-  }
+  subscribeToEvents(): void {}
 
-  setState(city: string, state: string): void {
-    // const localStor = localStorage.weatherForecast;
+  setState(patch: any): void {}
 
-    if (typeof state !== null) {
-      const arrCity = state.split(",");
-      let res = arrCity.find((item) => item === city);
-      if (res === undefined) {
-        if (state.length === 10) {
-          arrCity.shift();
-        }
-        const cityUpper = city[0].toUpperCase() + city.substring(1);
-        // const cityData = {
-        //   name: cityUpper,
-        //   tmp: 0,
-        // };
-        // const data = [];
-        // data.push(cityData);
-        state = state + `,${cityUpper}`;
-      }
-    } else {
-      state = city;
-    }
-    localStorage.setItem(this.#key, state);
+  onMount(el: HTMLElement): void {
+    //dataViewer(el, "none");console.log("6");
+    //dataViewer("plugList", "block");
+    //console.log(el);
+    el.style.display = "none";
+    const elplug = document.getElementById("plugList") as HTMLDivElement;
+    elplug.style.display = "block";
+
     this.render();
-    //getLocalStorage();
-  }
 
-  onMount() {}
+    el.style.display = "block";
+    elplug.style.display = "none";
+    //dataViewer(el, "block");
+    //dataViewer("plugList", "none");
+  }
 
   render(): string {
-    // state = {
-    //     title: "Weather in cities, ℃",
-    //     data: [
-    // {name: "Paris", tmp: 14},
-    // {name: "Moscow", tmp: 5},
-    // {name: "Tula", tmp: 10}
-    // ]
-    // }
+    const key = "weatherForecast";
+    const lS = localStorage.getItem(key) as string;
+    const arrCity = lS.split(",");
+    //console.log(arrCity,"2");
 
+    /*
     let dataWeather: CityData[] = [];
-    const arrCity = this.state.split(",");
+    const promise = Promise.all(
+      arrCity.map(async (element) => {
+        const tmp = await getTemperature(element) as string;
+        return {name: element, tmp};
+      })
+    );
+    */
 
-    arrCity.forEach((element) => {
-      let temp: string;
-      let cityData: CityData;
+    // console.log(dataWeather,"2");
 
-      (async function getTemp() {
-        temp = (await getTemperature(element)) as string;
-        cityData = {
-          name: element,
-          tmp: temp,
-        };
-        dataWeather.push(cityData);
-      })();
-    });
+    let htmlCityList = "";
+    let tpl = `
+      {{if city}}
+        {{for cities}}
+          <div id="{{city}}" class="block">
+            <div id="{{i}}" class="label btn">{{city}}</div>
+            <div class="value">{{tmp}}</div>
+          </div>
+        {{endfor}}
+      {{endif}}
+    `;
 
-    this.tpl = this.tpl.replace(
-      /\{\{if (\w+)}}(.+?)\{\{endif}}/g,
+    //const promise1 = promise.then((result) => {
+    //dataWeather = result;
+    tpl = tpl.replace(
+      /\{\{if (\w+)}}(\D+?)\{\{endif}}/,
       (tplMatch, grp, subTpl, mth, str) => {
-        if (this.state.length > 0) {
+        if (lS.length > 0) {
           return subTpl;
         }
         return "Data not found";
       }
     );
 
-    this.tpl = this.tpl.replace(
-      /\{\{for (\w+)}}(.+?)\{\{endfor}}/g,
+    const regex = /\{\{(\w+)}}/;
+
+    let currentTpl = "";
+    //console.log(tpl, "2");
+    tpl = tpl.replace(
+      /\{\{for (\w+)}}(\D+?)\{\{endfor}}/g,
       (tplMatch, grp, subTpl, mth, str) => {
-        dataWeather.forEach((element, index) => {
-          tplMatch.replace(/\{\{(\w+)}}/g, () => element.name);
-          tplMatch.replace(/\{\{(\w+)}}/g, () => index);
-          tplMatch.replace(/\{\{(\w+)}}/g, () => element.name);
-          tplMatch.replace(/\{\{(\w+)}}/g, () => element.tmp);
+        arrCity.forEach((element, index) => {
+          currentTpl = subTpl;
+          currentTpl = currentTpl.replace(regex, () => element);
+          currentTpl = currentTpl.replace(regex, () => index + 1);
+          currentTpl = currentTpl.replace(regex, () => element);
+          currentTpl = currentTpl.replace(regex, () => "1");
+          htmlCityList = htmlCityList + currentTpl;
         });
-        return tplMatch;
+        return htmlCityList;
       }
     );
+    //console.log(htmlCityList, "3");
+    return htmlCityList;
+    //});
 
-    this.tpl = this.tpl.replace(/\{\{(\w+)}}/g, (tpl, grp, mth, str) => {
-      if (this.state.hasOwnProperty(grp)) {
-        return this.state[grp];
-      }
-      return "Weather in cities, ℃";
-    });
-
-    return this.tpl;
+    return "1";
   }
 }
 
-export default CityList;
+interface CityData {
+  name: string;
+  tmp: string;
+}
+
+export class CityList extends Component {
+  // constructor() {
+  //   super();
+  // }
+}
+
+// export class CityList extends Component {
+//   #key: string;
+//   state: string;
+//   tpl: string;
+//   arrCity: string[];
+
+//   constructor() {
+
+//     this.#key = "weatherForecast";
+//     this.state = localStorage.getItem(this.#key) as string;
+
+//     this.tpl = `
+//       {{if city}}
+//         {{for cities}}
+//           <div id="{{city}}" class="block">
+//             <div id="{{i}}" class="label btn">{{city}}</div>
+//             <div class="value">{{tmp}}</div>
+//           </div>
+//         {{endfor}}
+//       {{endif}}
+//     `;
+
+//     this.arrCity = this.state.split(",");
+
+//     this.onMount();
+//   }
+
+//   subscribeToEvents(event: Event): void {
+//     setTimeout(() => {
+//       let classElem;
+//       let evt;
+//       if(evt){
+//         evt = <HTMLDivElement>event.target;
+//         classElem = evt.getAttribute("class");
+//       }
+//       if(evt){
+//         if (classElem === "block") {
+//           getWeather(evt.getAttribute("id"));
+//         } else {
+//           getWeather(evt.parentNode.getAttribute("id"));
+//         }
+//       }
+//     }, 300);
+//   }
+
+//   setState(city: string, state: string): void {
+//     // const localStor = localStorage.weatherForecast;
+
+//     if (typeof state !== null) {
+//       const arrCity = state.split(",");
+//       let res = arrCity.find((item) => item === city);
+//       if (res === undefined) {
+//         if (state.length === 10) {
+//           arrCity.shift();
+//         }
+//         const cityUpper = city[0].toUpperCase() + city.substring(1);
+//         // const cityData = {
+//         //   name: cityUpper,
+//         //   tmp: 0,
+//         // };
+//         // const data = [];
+//         // data.push(cityData);
+//         state = state + `,${cityUpper}`;
+//       }
+//     } else {
+//       state = city;
+//     }
+//     localStorage.setItem(this.#key, state);
+//     this.render();
+//     //getLocalStorage();
+//   }
+
+//   onMount() {
+//     if (typeof this.state === "undefined") {
+//       dataViewer("memory", "none");
+//       dataViewer("plugList", "block");
+//     } else {
+//       const memory = document.querySelectorAll("#memory > div");
+//       for (let j = 0; j < memory.length; j += 1) {
+//         memory[j].remove();
+//       }
+
+//       this.render();
+
+//       dataViewer("memory", "block");
+//       dataViewer("plugList", "none");
+//       // getClicker();
+
+//       // const memoryBl = document.getElementById("memory");
+//       // memoryBl.addEventListener("click", CityList.subscribeToEvents);
+//       // this.subscribeToEvents(Event);
+//     }
+//   }
+
+//   render(): string {
+//     let dataWeather: CityData[] = [];
+//     const promise = Promise.all(
+//       this.arrCity.map(async (element) => {
+//         const tmp = await getTemperature(element) as string
+//         return {name: element, tmp}
+//       })
+//     );
+
+//     // console.log(dataWeather,"2");
+
+//     let htmlCityList = "";
+
+//     const promise1 = promise.then((result) => {
+//       dataWeather = result;
+//       this.tpl = this.tpl.replace(
+//         /\{\{if (\w+)}}(\D+?)\{\{endif}}/,
+//         (tplMatch, grp, subTpl, mth, str) => {
+//           if (this.state.length > 0) {
+//             return subTpl;
+//           }
+//           return "Data not found";
+//         }
+//       );
+
+//       const regex = /\{\{(\w+)}}/;
+//       let currentTpl = "";
+//       // console.log(dataWeather, "3");
+//       this.tpl = this.tpl.replace(
+//         /\{\{for (\w+)}}(\D+?)\{\{endfor}}/g,
+//         (tplMatch, grp, subTpl, mth, str) => {
+//           dataWeather.forEach((element, index) => {
+//             currentTpl = subTpl;
+//             currentTpl = currentTpl.replace(regex, () => element.name);
+//             currentTpl = currentTpl.replace(regex, () => index + 1);
+//             currentTpl = currentTpl.replace(regex, () => element.name);
+//             currentTpl = currentTpl.replace(regex, () => element.tmp);
+//             htmlCityList = htmlCityList + currentTpl;
+//           });
+//           return htmlCityList;
+//         }
+//       )
+//       // console.log(htmlCityList, "3");
+//       return htmlCityList;
+//     });
+
+//     // const promise2 = promise1.then((result) => {
+//     //   // console.log(result, "3");
+//     //   this.tpl = this.tpl.replace(/\{\{for (\w+)}}(\D+?)\{\{endfor}}/, htmlCityList);
+//     //   console.log(this.tpl, "5");
+//     // });
+
+// // console.log(promise3);
+//     const promise2 = promise1.then((result) => {
+//       htmlCityList = result;
+//       console.log(htmlCityList, "1");
+//       return htmlCityList;
+//     });
+//     console.log(htmlCityList, "2");
+//     return htmlCityList;
+//   }
+// export default CityList;
+// }
